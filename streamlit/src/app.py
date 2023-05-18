@@ -28,8 +28,11 @@ def generate_response(prompt, cypher=True):
             temperature=0.5,
         )
         cypher_query = completions.choices[0].text
-        message = read_query(cypher_query)
-        return message, cypher_query
+        if 'MATCH' not in cypher_query:
+            return '', cypher_query
+        else:
+            message = read_query(cypher_query)
+            return message, cypher_query
     else:
         completions = openai.Completion.create(
             engine="text-davinci-003",
