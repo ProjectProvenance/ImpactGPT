@@ -1,12 +1,18 @@
 import os
 import openai
 import streamlit as st
+import requests
 from streamlit_chat import message
 
 from driver import read_query, get_article_text
 from train_cypher import examples
 
 st.title("NeoGPT : GPT3 + Neo4j")
+
+def get_query_params
+    return st.experimental_get_query_params()
+
+st.info(f'The current params are {get_query_params()}')
 
 openai.api_key = os.environ.get('OPENAI_KEY')
 
@@ -47,7 +53,7 @@ if 'past' not in st.session_state:
 
 def get_text():
     input_text = st.text_input(
-        "Ask away", "", key="input")
+        "ProvGPT: Ask away!", "", key="input")
     return input_text
 
 
@@ -62,6 +68,9 @@ user_input = get_text()
 
 
 if user_input:
+    # Append '?' to user_input if not present
+    if not user_input.endswith('?'):
+        user_input += '?'
     # Summarize articles
     if "summar" in user_input.lower():
         article_title = user_input.split(":")[1].strip()
