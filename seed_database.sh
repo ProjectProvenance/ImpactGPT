@@ -1,2 +1,2 @@
-pip install graphdatascience
-python notebooks/import.py
+#pip install graphdatascience
+#python notebooks/import.py
