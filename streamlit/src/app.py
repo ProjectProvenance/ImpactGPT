@@ -1,27 +1,32 @@
 import os
 import openai
 import streamlit as st
-import requests
 from streamlit_chat import message
 
 from driver import read_query, get_article_text
 from train_cypher import examples
 
-st.title("NeoGPT : GPT3 + Neo4j")
+st.set_page_config(layout="wide")
 
-def get_query_params
-    return st.experimental_get_query_params()
+st.title("ImpactGPT")
 
-st.info(f'The current params are {get_query_params()}')
+
+params = st.experimental_get_query_params()
+context = f' My organisation has the follow attributes {params}. if i mention schemes or organizations or say something like "for me" or "my business" please use this attribute info. '
+warning = ' If it does not seem like i am asking about schemes, proof points, claims or anything sustainability or business related, please do not attempt to write a cypher query and just respond normally. '
+# st.info(context)
 
 openai.api_key = os.environ.get('OPENAI_KEY')
 
 
 def generate_response(prompt, cypher=True):
-    if cypher:
+    if cypher and ('scheme' in prompt.lower() or 'proof point' in prompt.lower()):
         completions = openai.Completion.create(
             engine="text-davinci-003",
-            prompt=examples + "\n#" + prompt,
+            prompt=examples + "\n#" +
+            # TODO: include user/account/org context into training
+            # +  context + "\n#"
+            prompt + "\n#" + warning,
             max_tokens=1000,
             n=1,
             stop=None,
@@ -29,14 +34,25 @@ def generate_response(prompt, cypher=True):
         )
         cypher_query = completions.choices[0].text
         if 'MATCH' not in cypher_query:
-            return '', cypher_query
+            return cypher_query, ''
         else:
             message = read_query(cypher_query)
             return message, cypher_query
+    elif 'integration' in prompt.lower():
+        completions = openai.Completion.create(
+            engine="text-davinci-003",
+            prompt=integration_info + "\n#" + prompt + "\n#" + warning,
+            max_tokens=256,
+            n=1,
+            stop=None,
+            temperature=0.5,
+        )
+        message = completions.choices[0].text
+        return message, None
     else:
         completions = openai.Completion.create(
             engine="text-davinci-003",
-            prompt="Summarize the following article: \n" + prompt,
+            prompt=context + "\n#" + prompt + "\n#" + warning,
             max_tokens=256,
             n=1,
             stop=None,
@@ -56,18 +72,19 @@ if 'past' not in st.session_state:
 
 def get_text():
     input_text = st.text_input(
-        "ProvGPT: Ask away!", "", key="input")
+        "Questions about the framework? Ask away!", "", key="input")
     return input_text
 
 
 col1, col2 = st.columns([2, 1])
 
 
+user_input = get_text()
+
 with col2:
     another_placeholder = st.empty()
 with col1:
     placeholder = st.empty()
-user_input = get_text()
 
 
 if user_input:
@@ -96,13 +113,26 @@ if user_input:
 # Message placeholder
 with placeholder.container():
     if st.session_state['generated']:
+
         message(st.session_state['past'][-1],
                 is_user=True, key=str(-1) + '_user')
-        for j, text in enumerate(st.session_state['generated'][-1][0]):
-            message(text, key=str(-1) + str(j))
+
+        is_empty_response = not bool(st.session_state['generated'][-1][0])
+
+
+
+        # Check if the output is a list or a string
+        if isinstance(st.session_state['generated'][-1][0], list):
+            for j, text in enumerate(st.session_state['generated'][-1][0]):
+                message(text, key=str(-1) + str(j))
+        else:
+            if is_empty_response:
+                message('No Data Found :/')
+            message(st.session_state['generated'][-1][0], key='gpt_output')
+
 
 # Generated Cypher statements
-with another_placeholder.container():
-    if st.session_state['generated']:
-        st.text_area("Generated Cypher statement",
-                     st.session_state['generated'][-1][1], height=240)
+#with another_placeholder.container():
+ #   if st.session_state['generated']:
+  #      st.text_area("Generated Cypher statement",
+   #                  st.session_state['generated'][-1][1], height=240)
