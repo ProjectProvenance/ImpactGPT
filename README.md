@@ -1,6 +1,21 @@
-# NeoGPT-Explorer
+# ImpactGPT
 
-Find more information at: https://medium.com/neo4j/knowledge-graph-based-chatbot-with-gpt-3-and-neo4j-c4ebbd325ed
+The base code was forked from https://github.com/tomasonjo/NeoGPT-Explorer.
+
+Info on this project can be found here: https://medium.com/neo4j/knowledge-graph-based-chatbot-with-gpt-3-and-neo4j-c4ebbd325ed
+
+## Intro
+
+An AI chatbot that takes user input and generates a query to return framework data.
+
+User inputs relating to Proof Points, Schemes or Claims Data will prompt GPT-3 to generate
+a cypher query.
+
+The database will be queried and results returned.
+
+Queries not relating to the framework will prompt GPT-3 for a response directly and is more unpredictable.
+
+## How to Run
 
 Run the following commands to start the services:
 
@@ -13,41 +28,21 @@ Run the following commands to start the services:
 docker-compose up
 ```
 
-3. On the first run, you need to seed the database with the following command
-
-```
-sh seed_database.sh
-```
-
-If you are using Windows, you can also execute the `notebooks/Import.ipynb` notebook for initial import
-
-4. Open localhost:8501 in your browser
+3. Open localhost:8501 in your browser
 
 ## Example questions
 
-What are the latest news?
+What is the vegetarian proof point?
 
-What are the latest news about Apple?
+What is the evidence for the vegan proof point?
 
-What are the latest news about COVID-19?
+My company uses renewable energy, which proof points would i be eligible for?
 
-What are the latest news about education?
-
-Who was mentioned in a positive light lately?
-
-Most mentioned people in the last 100 articles?
-
-What are the latest facts?
-
-What do you know about Andrew Macintosh?
-
-Where does Ian Chubb work?
-
-What are most mentioned people in sports?
+All our products are recyclable, which proof points might I be eligible fo
 
 ## Data 
 
-Testing dataset consists of 1000 latest articles from Kaggle repository: https://www.kaggle.com/datasets/adityakharosekar2/guardian-news-articles
+The app is connected to our neo4j knowledge graph instance currently containing scheme data. 
 
 ## Preprocessing
 
